@@ -2,7 +2,7 @@ streamlit>=1.26.0
 streamlit
 gtts
 pydub
-PyMuPDF
+pymupdf
 speechrecognition
 pyttsx3
 vosk
