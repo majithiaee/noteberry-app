@@ -4,6 +4,7 @@ import html
 import pickle
 
 import base64
+import pyaudio
 
 import os
 from gtts import gTTS
