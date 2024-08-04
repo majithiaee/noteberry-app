@@ -1,5 +1,14 @@
 streamlit>=1.26.0
+streamlit
 gtts
 pydub
-SpeechRecognition
+PyMuPDF
+speechrecognition
+pyttsx3
+vosk
+requests
+markdown-pdf
 google-generativeai
+ipython
+pyaudio
+
