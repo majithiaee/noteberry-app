@@ -59,7 +59,6 @@ if not os.path.exists(model_dir):
 
 # Load the Vosk model
 model = Model(model_dir)
-model.generate_content()
 
 
 
