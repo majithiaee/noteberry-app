@@ -4,7 +4,3 @@ backgroundColor = "#f0f4f8"         # Light background color
 secondaryBackgroundColor = "#ffffff" # White for secondary elements
 textColor = "#333333"               # Dark gray text for readability
 font = "sans serif"                 # Generic font type; Poppins will be imported in styling.
-
-[server]
-port = 8501                         # Default port for running the Streamlit app
-enableCORS = false                  # Disable CORS for local development

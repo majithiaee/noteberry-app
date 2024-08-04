@@ -1,2 +1,5 @@
 streamlit>=1.26.0
-
+gtts
+pydub
+SpeechRecognition
+google-generativeai
