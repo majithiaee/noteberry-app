@@ -854,7 +854,6 @@ def generatecontent(recordingmode = False):
 if recordingmode:
     import shutil
 
-    import wave
     import os
 
 
