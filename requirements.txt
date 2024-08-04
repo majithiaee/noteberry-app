@@ -10,5 +10,4 @@ requests
 markdown-pdf
 google-generativeai
 ipython
-pyaudio
 
