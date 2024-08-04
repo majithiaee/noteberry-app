@@ -3,7 +3,6 @@ import time as t
 import html
 import pickle
 
-from fpdf import FPDF
 import base64
 
 import os
