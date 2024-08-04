@@ -557,7 +557,7 @@ def generatecontent(recordingmode = False):
 
         # The 'with' statement is used here to manage the spinner context
         with st.spinner("Initializing AI Model..."):
-            genai.configure(api_key=st.secrets[api_key])
+            genai.configure(api_key=st.secrets["api_key"])
 
             model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -760,7 +760,7 @@ def generatecontent(recordingmode = False):
 
         # The 'with' statement is used here to manage the spinner context
         with st.spinner("Initializing AI Video Model..."):
-            genai.configure(api_key='AIzaSyCZObffhLbps5I-NhjgDF5seb-eeZQ8bP8')
+            genai.configure(api_key=st.secrets["api_key"])
 
             model = genai.GenerativeModel('gemini-1.5-flash')
 
