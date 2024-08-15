@@ -115,10 +115,7 @@ def show_pdf_file():
     st.markdown(f'<p class="custom-font">{html}</p>', unsafe_allow_html=True)
 
 
-import pathlib
 import textwrap
-import tempfile
-from datetime import time
 
 import google.generativeai as genai
 
@@ -197,7 +194,7 @@ def generatecontent():
         show_pdf_file()
 
         # Render the styled box using st.markdown
-        st.markdown(f'<p class="custom-font">{myContainer.notestext}</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="custom-font">{myContainer.notestext}</p>', unsafe_allow_html=False)
         myContainer.pressed = False
 
 
