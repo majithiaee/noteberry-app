@@ -23,42 +23,15 @@ active_color = "#155a8a"      # Even darker shade for active states
 
 def inject_styles():
     # Inject custom CSS with the button styled to be bold
-    st.markdown(
-        f"""
-              <style>
-              body {{
-                  font-family: 'poppins', sans-serif;
-                  background-color: {background_color}; /* light background */
-                  color: {text_color}; /* darker text for contrast */
-                  margin: 0; /* remove default margin */
-                  padding: 0; /* remove default padding */
-                  line-height: 1.6; /* improve readability */
-              }}
-              h1, h2, h3, h4, h5, h6 {{
-                  font-family: 'poppins', sans-serif;
-                  color: {primary_color}; /* soft blue color for headings */
-                  font-weight: 600; /* bold headings */
-                  margin-bottom: 10px; /* space below headings */
-              }}
-              .stbutton > button {{
-                  background-color: {primary_color}; /* custom primary color buttons */
-                  color: white; /* white text on buttons */
-                  border-radius: 8px; /* rounded corners */
-                  padding: 10px 20px; /* button padding */
-                  font-size: 16px; /* button text size */
-                  font-family: 'poppins', sans-serif; /* font for button text */
-                  border: none; /* remove default border */
-                  cursor: pointer; /* pointer on hover */
-                  font-weight: bold; /* make text bold */
-                  transition: background-color 0.3s ease; /* smooth transition */
-              }}
-              .stbutton > button:hover {{
-                  background-color: #5a8e99; /* slightly darker shade on hover */
-              }}
-              </style>
-              """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    body {
+        font-family: 'Gaegu', sans-serif;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 
 inject_styles()
 
@@ -69,105 +42,6 @@ def read_pdf(file):
         page = pdf_document.load_page(page_num)
         text += page.get_text("text")  # Using "text" option for better text extraction
     return text
-
-
-def silence_based_conversion(audio_file):
-    # open the audio file stored in
-    # the local system as a wav file.
-    song = AudioSegment.from_wav(audio_file)
-
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
-        temp_song_name = temp_file.name
-        song.export(temp_song_name, format="wav")
-
-    st.audio(temp_song_name)
-
-    # open a file where we will concatenate
-    # and store the recognized text
-    full_transcription = ""
-    pickle.dump(full_transcription, open("silence_based_transcript.p", "wb"))
-
-    # split track where silence is 0.5 seconds
-    # or more and get chunks
-    # Set the interval in milliseconds (e.g., 30 seconds)
-    interval = 30 * 1000  # 30 seconds
-
-    # Split the audio into chunks and store them in a list
-    chunks = [song[i:i + interval] for i in range(0, len(song), interval)]
-
-    #chunks = split_on_silence(song,
-                              # must be silent for at least 0.5 seconds
-                              # or 500 ms. adjust this value based on user
-                              # requirement. if the speaker stays silent for
-                              # longer, increase this value. else, decrease it.
-                              #min_silence_len=600,
-
-                              # consider it silent if quieter than -16 dBFS
-                              # adjust this per requirement
-                              #silence_thresh=-16
-                              #)
-
-    i = 0
-    # process each chunk
-    for chunk in chunks:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
-            temp_file_name = temp_file.name
-            chunk.export(temp_file_name, format="wav")
-
-
-        # create a speech recognition object
-        r = speech_recognition.Recognizer()
-
-        # recognize the chunk
-        with speech_recognition.AudioFile(temp_file_name) as source:
-            audio_listened = r.listen(source)
-
-        try:
-            # try converting it to text
-            rec = r.recognize_houndify(audio_listened)
-            rec = rec[14 : len(rec) - 3]
-            # write the output to the file.
-            full_transcription = str(pickle.load(open("silence_based_transcript.p", "rb")))
-            pickle.dump(full_transcription + rec + " ", open("silence_based_transcript.p", "wb"))
-            # catch any errors.
-        except speech_recognition.UnknownValueError:
-            r = speech_recognition.Recognizer()
-        except speech_recognition.RequestError as e:
-            st.write("Could not request results. check your internet connection")
-
-        i += 1
-
-
-def wav_to_audiodata(wav_file_path):
-    # Initialize the recognizer
-    recognizer = speech_recognition.Recognizer()
-
-    # Load the WAV file using AudioFile
-    audio_data = speech_recognition.AudioFile(wav_file_path)
-
-    # Convert the WAV file to AudioData
-    with audio_data as source:
-        audio = recognizer.record(source)
-
-    return audio
-
-
-# Example usage:
-# audiodata = wav_to_audiodata("path_to_your_file.wav")
-
-
-def convert_to_wav_mono_pcm(input_file):
-    # Load the audio file
-    audio = AudioSegment.from_file(input_file)
-    # Convert to mono
-    audio = audio.set_channels(1)
-    # Ensure it is PCM format
-    audio = audio.set_sample_width(2)
-    # Create a temporary file for the converted audio
-    output_file = "converted.wav"
-    # Export as WAV
-    audio.export(output_file, format="wav")
-    return output_file
 
 def create_download_link(filename):
     with open(filename, "rb") as f:
@@ -186,6 +60,8 @@ def show_pdf_file():
         Section(
             '''<style>
             @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+            
             body {
             font-family: 'Roboto', sans-serif;
             font-size: 12pt;
@@ -309,32 +185,6 @@ def generatecontent():
         myContainer.pressed = False
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # Use the input from the text area to run code
     elif contentformat == 'Generate Video Notes (Experimental)' and not myContainer.pressed:
         myContainer.notestext = None
@@ -424,11 +274,6 @@ def generatecontent():
             loading_message = st.empty()
             st.write("Video Link:", result['project']['link'])
             myContainer.pressed = False
-
-            # print("Project ID:", result['project']['id'])
-            # print("Project Title:", result['project']['title'])
-            # print("Project Link:", result['project']['link'])
-            # print("Project Thumbnail:", result['project']['thumbnail'])
         else:
             st.write("There was an error. Please try again.")
             myContainer.pressed = False
