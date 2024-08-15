@@ -709,7 +709,7 @@ def generatecontent():
 
 if st.button("Generate"):
     st.toast("Generation Started...")
-    generatecontent(recordingmode=False)
+    generatecontent()
     st.toast("Generation Complete!")
     st.balloons()
 
