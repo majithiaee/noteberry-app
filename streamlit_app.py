@@ -1,25 +1,16 @@
 import streamlit as st
 import time as t
-import html
 import pickle
 
 import base64
-import pyaudio
 
-import os
-from gtts import gTTS
 from pydub import AudioSegment
-from pydub.silence import split_on_silence
-from io import BytesIO
+
 
 import fitz  # PyMuPDF
 
 import speech_recognition
-import pyttsx3
 
-from vosk import KaldiRecognizer, Model
-import zipfile
-import requests
 
 
 # Define your colors
@@ -239,7 +230,6 @@ from datetime import time
 
 import google.generativeai as genai
 
-from IPython.display import display
 from IPython.display import Markdown
 
 st.title("NoteBerry :grapes:")
