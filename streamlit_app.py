@@ -338,7 +338,7 @@ def silence_based_conversion(audio_file):
 
         try:
             # try converting it to text
-            rec = r.recognize_vosk(audio_listened)
+            rec = r.recognize_houndify(audio_listened)
             rec = rec[14 : len(rec) - 3]
             # write the output to the file.
             full_transcription = str(pickle.load(open("silence_based_transcript.p", "rb")))
@@ -507,22 +507,19 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-option = st.selectbox('Select an option',['Upload Audio/Record a Lecture', 'Upload PDF/Enter Text Content'])
 contentformat = st.selectbox('Select an option',['Generate Notes', 'Generate Audio Notes', 'Generate Video Notes (Experimental)'])
 summarize = st.checkbox("Summarize (This will condense the content into short, precise information)")
 
-recordingmode = option == 'Upload Audio/Record a Lecture'
-uploadedaudio = st.file_uploader(label="Upload WAV or MP3 Audio", type=['wav', 'mp3']) if recordingmode else st.empty()
-uploadedtext = st.file_uploader(label="Upload PDF Document (May not work well with Math/Equations)", type='pdf', on_change=inject_styles) if not recordingmode else st.empty()
+uploadedtext = st.file_uploader(label="Upload PDF Document (May not work well with Math/Equations)", type='pdf', on_change=inject_styles)
 
 subheader = st.empty()
 
-if uploadedtext is None or uploadedaudio is None:
+if uploadedtext is None:
     subheader = st.subheader("OR")
 else:
     subheader = st.empty()
 
-user_input = None if recordingmode else (st.text_area("Enter your content:", height=200) if uploadedtext is None else read_pdf(uploadedtext))
+user_input = st.text_area("Enter your content:", height=200) if uploadedtext is None else read_pdf(uploadedtext)
 
 
 class datacontainerobj:
@@ -536,11 +533,6 @@ class datacontainerobj:
 
         self.pressed = False
         self.notestext = None
-        self.audiogeneratefromlecture = None
-        self.hasStoppedRecording = False
-        self.hasStartedRecording = False
-        self.transcription = None
-        self.transcript = ""
 
 
 myContainer = datacontainerobj()
@@ -549,7 +541,7 @@ myContainer = datacontainerobj()
 
 
 
-def generatecontent(recordingmode = False):
+def generatecontent():
     myContainer.pressed = False
     # Use the input from the text area to run code
     if contentformat == 'Generate Notes' and not myContainer.pressed:
@@ -557,7 +549,7 @@ def generatecontent(recordingmode = False):
 
         # The 'with' statement is used here to manage the spinner context
         with st.spinner("Initializing AI Model..."):
-            genai.configure(api_key=st.secrets["api_key"])
+            genai.configure(api_key="AIzaSyCZObffhLbps5I-NhjgDF5seb-eeZQ8bP8")
 
             model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -565,7 +557,7 @@ def generatecontent(recordingmode = False):
             text = text.replace('•', '  *')
             return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 
-        input_text = user_input if not recordingmode else myContainer.audiotranscription
+        input_text = user_input
 
         response = ""
 
@@ -616,143 +608,6 @@ def generatecontent(recordingmode = False):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    elif contentformat == 'Generate Audio Notes' and not myContainer.pressed:
-        myContainer.notestext = None
-        myContainer.pressed = True
-
-        # The 'with' statement is used here to manage the spinner context
-        with st.spinner("Initializing AI Audio Model..."):
-            genai.configure(api_key=st.secrets["api_key"])
-
-            model = genai.GenerativeModel('gemini-1.5-flash')
-
-        def to_markdown(text):
-            text = text.replace('•', '  *')
-            return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
-
-        input_text = user_input if not recordingmode else myContainer.audiotranscription
-
-        with st.spinner("Processing your content with AI..."):
-            myContainer.audiogeneratefromlecture = model.generate_content(str('''Summarize and put this content into notes with ALL of the
-                information. Include all information, don't leave out ANY content. Then, take those notes and make it into a long paragraph to be read out loud as a 
-                lecture, proportional to the length of the notes. No characters other than what you would see in an english essay, because
-               a text to speech agent will be reading this out loud. For example, no greater than symbols because the
-               text to speech agent will read out "greater than symbol." Have good spacing in the script because
-               a transcript will be provided. Don't provide me with the notes, just the lecture script paragraph. If certain sentences don't make sense,
-                rephrase the sentence to make sense in English language (as some of the sentences are from a faulty audio transript). Heres the content:''') + str(
-                input_text)).text if not summarize else model.generate_content(str('''Summarize and condense this content into notes with just the most important
-                information. Only get the important info and overview, no need to include all of the content. Just a brief summary of the most important stuff. 
-                Then, take those notes and make it into a paragraph to be read out loud as a lecture, proportional to the length of the notes. 
-                No characters other than what you would see in an english essay, because
-               a text to speech agent will be reading this out loud. For example, no greater than symbols because the
-               text to speech agent will read out "greater than symbol." Have good spacing in the script because
-               a transcript will be provided. Don't provide me with the notes, just the lecture script paragraph. If certain sentences don't make sense,
-                rephrase the sentence to make sense in English language (as some of the sentences are from a faulty audio transript). Heres the content:''') + str(
-                input_text)).text
-
-        # Function to split text into segments of maximum 1500 characters ending at sentence boundaries
-        def split_text_into_segments(text, max_length=1500):
-            import re
-            sentence_endings = re.compile(r'(?<=[.!?]) +')
-            sentences = sentence_endings.split(text)
-
-            segments = []
-            current_segment = ""
-
-            for sentence in sentences:
-                if len(current_segment) + len(sentence) + 1 <= max_length:
-                    if current_segment:
-                        current_segment += " "
-                    current_segment += sentence
-                else:
-                    segments.append(current_segment)
-                    current_segment = sentence
-
-            if current_segment:
-                segments.append(current_segment)
-
-            return segments
-
-        # Function to synthesize speech and return audio bytes using gTTS
-        def synthesize_speech(text, lang='en'):
-            tts = gTTS(text=text, lang=lang)
-            audio_bytes = BytesIO()
-            tts.write_to_fp(audio_bytes)
-            audio_bytes.seek(0)
-            return audio_bytes.read()
-
-        # Function to join audio streams
-        def join_audio_streams(audio_streams):
-            combined = AudioSegment.empty()
-            for audio_stream in audio_streams:
-                audio_segment = AudioSegment.from_file(BytesIO(audio_stream))
-                combined += audio_segment
-
-            output_bytes = BytesIO()
-            combined.export(output_bytes, format="mp3")
-            output_bytes.seek(0)
-            return output_bytes
-
-        # Main text to be converted to speech
-        text_to_convert = myContainer.audiogeneratefromlecture
-
-        with st.spinner("Generating Audio File... "):
-            # Split the text into segments
-            segments = split_text_into_segments(text_to_convert)
-
-            # Synthesize speech for each segment and collect audio streams
-            audio_streams = []
-            for segment in segments:
-                audio_stream = synthesize_speech(segment)
-                audio_streams.append(audio_stream)
-
-            # Join the audio streams into one
-            final_output_bytes = join_audio_streams(audio_streams)
-
-        # Display the combined audio to the user
-        st.write("Your audio file is ready!")
-        st.audio(final_output_bytes.getvalue(), format='audio/mp3')
-        st.write("")
-        st.subheader("Transcript:")
-        with st.spinner("Generating user-friendly transcript..."):
-            st.markdown((model.generate_content('''If there are any math equations present or anything that looks like it
-            should be a math equation (such as the limit of f of x as x approaches a), convert them
-                                                to latex notation. Add in markdown headers and subheaders. Keep the text unchanged.
-                                                Keeping the text unchanged, use markdown format to apply bullet points and use markdown-style tables and numbered lists if applicable (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them).
-                                                Keep everything else unchanged. If there is math that should be converted to equations or symbols
-                                                use Latex notation. Keep the text unchanged.
-                                                Here's the content: ''' + myContainer.audiogeneratefromlecture).text),
-                        unsafe_allow_html=True)
-        myContainer.pressed = False
-
-
-
     # Use the input from the text area to run code
     elif contentformat == 'Generate Video Notes (Experimental)' and not myContainer.pressed:
         myContainer.notestext = None
@@ -760,7 +615,7 @@ def generatecontent(recordingmode = False):
 
         # The 'with' statement is used here to manage the spinner context
         with st.spinner("Initializing AI Video Model..."):
-            genai.configure(api_key=st.secrets["api_key"])
+            genai.configure(api_key="AIzaSyCZObffhLbps5I-NhjgDF5seb-eeZQ8bP8")
 
             model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -768,7 +623,7 @@ def generatecontent(recordingmode = False):
             text = text.replace('•', '  *')
             return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 
-        input_text = user_input if not recordingmode else myContainer.audiotranscription
+        input_text = user_input
 
         with st.spinner("Processing your content with AI..."):
             response = model.generate_content(str('''Summarize and put this content into notes with ALL of the
@@ -852,86 +707,7 @@ def generatecontent(recordingmode = False):
             myContainer.pressed = False
 
 
-if recordingmode:
-    import shutil
-
-    import os
-
-
-    def specialgeneratefortranscribe():
-        transcripttorender = str(pickle.load(open("audiotranscription.p", "rb")))
-        with st.expander("Final Transcript"):
-            st.write(transcripttorender)
-        myContainer.audiotranscription = transcripttorender
-        st.write("Recording Stopped.")
-        myContainer.hasStoppedRecording = True
-        st.toast("Generation Started...")
-        generatecontent(recordingmode=True)
-        st.toast("Generation Complete!")
-        st.balloons()
-        st.session_state.running = False
-
-    def record_and_transcribe_audio(stopbutton : st.button):
-        if stopbutton:
-            specialgeneratefortranscribe()
-
-        if st.session_state.running == True:
-            recognizer = speech_recognition.Recognizer()
-
-            try:
-                with speech_recognition.Microphone() as mic:
-                    recognizer.adjust_for_ambient_noise(mic)
-                    audio = recognizer.listen(mic)
-
-                    text = recognizer.recognize_google(audio)
-                    text = text.lower()
-                    myContainer.transcript = myContainer.transcript + text
-                    myContainer.transcription.write(str(myContainer.transcript))
-                    myContainer.audiotranscription = str(myContainer.transcript)
-                    pickle.dump(myContainer.audiotranscription, open("audiotranscription.p", "wb"))
-
-
-            except speech_recognition.UnknownValueError:
-                recognizer = speech_recognition.Recognizer()
-                pass
-
-
-    if 'running' not in st.session_state:
-        st.session_state.running = False
-
-    if uploadedaudio is None:
-        startbutton = st.button("Start Recording")
-        subheader = st.empty()
-
-        if startbutton:
-            subheader = st.subheader("Transcript: ")
-            myContainer.transcription = st.empty()
-            st.session_state.running = True
-
-    if st.session_state.running == True:
-        stopbutton = st.button("Stop Recording")
-
-        for i in range(10000):
-            if st.session_state.running == False:
-                break
-            record_and_transcribe_audio(stopbutton=stopbutton)
-
-    elif st.button("Generate from Upload"):
-        with st.status(label = "Transcribing Upload", expanded = True):
-            silence_based_conversion(convert_to_wav_mono_pcm(uploadedaudio))
-            text = str(pickle.load(open("silence_based_transcript.p", "rb")))
-            st.write(str(text))
-            myContainer.audiotranscription = str(text)
-
-        st.toast("Generation Started...")
-        generatecontent(recordingmode=True)
-        st.toast("Generation Complete!")
-        st.balloons()
-
-
-
-
-elif st.button("Generate"):
+if st.button("Generate"):
     st.toast("Generation Started...")
     generatecontent(recordingmode=False)
     st.toast("Generation Complete!")
