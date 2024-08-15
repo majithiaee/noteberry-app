@@ -1,4 +1,3 @@
-import markdown
 import streamlit as st
 import time as t
 import pickle
@@ -16,8 +15,12 @@ import re
 
 import re
 
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+
 def markdown_to_html(inputStr):
-    return markdown.markdown(inputStr)
+    return highlight(markdown.markdown(inputStr), PythonLexer(), HtmlFormatter())
 
 def inject_styles():
     # Inject custom CSS with the button styled to be bold
