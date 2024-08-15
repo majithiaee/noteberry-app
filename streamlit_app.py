@@ -43,7 +43,7 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css?family=Gaegu');
 
     .custom-font {
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Gaegu', sans-serif;
     }
     </style>
     """,
