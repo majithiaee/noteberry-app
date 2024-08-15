@@ -232,7 +232,7 @@ def inject_styles():
             font-family: 'Poppins', sans-serif; /* Font for toast text */
         }}
         </style>
-        """,
+        """ + hide_streamlit_style,
         unsafe_allow_html=True,
     )
 
