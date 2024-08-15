@@ -76,6 +76,33 @@ def parse_table(headers, alignments, rows):
     table_html += '</tbody></table>'
     return table_html
 
+markdown_text = """
+# Header 1
+## Header 2
+
+This is **bold text**, this is *italic text*, and this is `inline code`.
+
+Here is a [link](http://example.com).
+
+* List item 1
+* List item 2
+
+| Header 1 | Header 2 |
+|----------|----------|
+| Row 1 Col 1 | Row 1 Col 2 |
+| Row 2 Col 1 | Row 2 Col 2 |
+
+Inline LaTeX: $E = mc^2$
+
+Block LaTeX:
+$$
+\\frac{a}{b} = c
+$$
+"""
+
+html_output = markdown_to_html(markdown_text)
+st.html(html_output)
+
 # Define your colors
 background_color = "#ffffff"  # Main background color
 text_color = "#333333"        # Text color
