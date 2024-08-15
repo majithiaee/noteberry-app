@@ -63,7 +63,6 @@ model = Model(model_dir)
 
 
 hide_streamlit_style = """
-            <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             </style>
@@ -231,8 +230,8 @@ def inject_styles():
             color: white; /* Toast text color */
             font-family: 'Poppins', sans-serif; /* Font for toast text */
         }}
-        </style>
-        """ + hide_streamlit_style,
+        """
+         + hide_streamlit_style,
         unsafe_allow_html=True,
     )
 
