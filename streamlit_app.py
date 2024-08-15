@@ -13,6 +13,8 @@ import speech_recognition
 
 import re
 
+import re
+
 def markdown_to_html(markdown_text):
     html = markdown_text
 
@@ -28,6 +30,9 @@ def markdown_to_html(markdown_text):
     html = re.sub(r'\*\*\*(.*?)\*\*\*', r'<b><i>\1</i></b>', html)  # Bold + Italic
     html = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', html)  # Bold
     html = re.sub(r'\*(.*?)\*', r'<i>\1</i>', html)  # Italic
+
+    # Inline Code
+    html = re.sub(r'`(.*?)`', r'<code>\1</code>', html)  # Inline code
 
     # Lists
     html = re.sub(r'^\s*\*\s*(.*)', r'<li>\1</li>', html, flags=re.MULTILINE)
@@ -51,7 +56,6 @@ def markdown_to_html(markdown_text):
     html = re.sub(r'\$(.*?)\$', r'<span class="latex">\1</span>', html)  # Inline LaTeX
 
     return html
-
 
 def parse_table(headers, alignments, rows):
     header_cells = headers.split('|')
