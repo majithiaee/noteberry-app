@@ -194,7 +194,7 @@ def generatecontent():
         show_pdf_file()
 
         # Render the styled box using st.markdown
-        st.markdown(f'<p class="custom-font">{myContainer.notestext}</p>', unsafe_allow_html=False)
+        st.markdown(f'<div class="custom-font">{myContainer.notestext}</div>', unsafe_allow_html=False)
         myContainer.pressed = False
 
 
