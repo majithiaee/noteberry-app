@@ -128,18 +128,18 @@ def inject_styles():
 
 
 # Use st.markdown to include custom CSS for the font
-'''st.markdown(
-    """
-    <style>
-    @import url('https://fonts.googleapis.com/css?family=Gaegu');
-
-    .custom-font {
-        font-family: 'Gaegu', sans-serif;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)'''
+#st.markdown(
+#    """
+ #   <style>
+  #  @import url('https://fonts.googleapis.com/css?family=Gaegu');
+#
+ #   .custom-font {
+  #      font-family: 'Gaegu', sans-serif;
+   # }
+    #</style>
+    #""",
+    #unsafe_allow_html=True
+#)
 
 
 def read_pdf(file):
