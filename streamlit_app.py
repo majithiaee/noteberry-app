@@ -196,6 +196,7 @@ def generatecontent():
 
         # Render the styled box using st.markdown
         st.html(markdown_to_html(myContainer.notestext))
+        st.markdown(myContainer.notestext, unsafe_allow_html=True)
         myContainer.pressed = False
 
 
