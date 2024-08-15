@@ -35,6 +35,24 @@ def inject_styles():
 
 inject_styles()
 
+
+# Use st.markdown to include custom CSS for the font
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+
+    .custom-font {
+        font-family: 'Roboto', sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Use st.markdown with the custom class
+st.markdown('<p class="custom-font">This is your body text with a custom font!</p>', unsafe_allow_html=True)
+
 def read_pdf(file):
     pdf_document = fitz.open(stream=file.read(), filetype="pdf")
     text = ""
