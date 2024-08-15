@@ -1,15 +1,76 @@
 import streamlit as st
 import time as t
-import markdown
+import pickle
 
 import base64
 
+from pydub import AudioSegment
 
 
 import fitz  # PyMuPDF
 
+import speech_recognition
+
+import re
+
+def markdown_to_html(markdown_text):
+    html = markdown_text
+
+    # Headers
+    html = re.sub(r'###### (.*)', r'<h6>\1</h6>', html)
+    html = re.sub(r'##### (.*)', r'<h5>\1</h5>', html)
+    html = re.sub(r'#### (.*)', r'<h4>\1</h4>', html)
+    html = re.sub(r'### (.*)', r'<h3>\1</h3>', html)
+    html = re.sub(r'## (.*)', r'<h2>\1</h2>', html)
+    html = re.sub(r'# (.*)', r'<h1>\1</h1>', html)
+
+    # Bold and Italic
+    html = re.sub(r'\*\*\*(.*?)\*\*\*', r'<b><i>\1</i></b>', html)  # Bold + Italic
+    html = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', html)  # Bold
+    html = re.sub(r'\*(.*?)\*', r'<i>\1</i>', html)  # Italic
+
+    # Lists
+    html = re.sub(r'^\s*\*\s*(.*)', r'<li>\1</li>', html, flags=re.MULTILINE)
+    html = re.sub(r'(<li>.*</li>)', r'<ul>\1</ul>', html, flags=re.DOTALL)
+
+    # Links
+    html = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2">\1</a>', html)
+
+    # Line breaks
+    html = re.sub(r'\n', r'<br>', html)
+
+    # Tables
+    html = re.sub(
+        r'\|(.+)\|\n\|([-\s:|]+)\|\n((?:\|.+\|\n)+)',
+        lambda match: parse_table(match.group(1), match.group(2), match.group(3)),
+        html
+    )
+
+    # LaTeX notation
+    html = re.sub(r'\$\$(.*?)\$\$', r'<span class="latex">\1</span>', html)  # Block LaTeX
+    html = re.sub(r'\$(.*?)\$', r'<span class="latex">\1</span>', html)  # Inline LaTeX
+
+    return html
 
 
+def parse_table(headers, alignments, rows):
+    header_cells = headers.split('|')
+    row_lines = rows.strip().split('\n')
+    body_cells = [row.split('|') for row in row_lines]
+
+    table_html = '<table><thead><tr>'
+    for cell in header_cells:
+        table_html += f'<th>{cell.strip()}</th>'
+    table_html += '</tr></thead><tbody>'
+
+    for row in body_cells:
+        table_html += '<tr>'
+        for cell in row:
+            table_html += f'<td>{cell.strip()}</td>'
+        table_html += '</tr>'
+
+    table_html += '</tbody></table>'
+    return table_html
 
 # Define your colors
 background_color = "#ffffff"  # Main background color
@@ -19,8 +80,19 @@ secondary_color = "#f0f0f0"   # Secondary color for backgrounds and components
 hover_color = "#5a8e99"       # Darker shade for hover effects
 active_color = "#155a8a"      # Even darker shade for active states
 
+def inject_styles():
+    # Inject custom CSS with the button styled to be bold
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    body {
+        font-family: 'Gaegu', sans-serif;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 
+inject_styles()
 
 
 # Use st.markdown to include custom CSS for the font
@@ -36,12 +108,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-def markdown_to_custom_html(markdown_text):
-    # Convert Markdown to HTML
-    returnthis = markdown.markdown(markdown_text)
-    # Wrap HTML in a div with the custom style
-    return f'<div class="custom-font">{returnthis}</div>'
 
 
 def read_pdf(file):
@@ -108,7 +174,10 @@ def show_pdf_file():
     st.markdown(f'<p class="custom-font">{html}</p>', unsafe_allow_html=True)
 
 
+import pathlib
 import textwrap
+import tempfile
+from datetime import time
 
 import google.generativeai as genai
 
@@ -119,7 +188,7 @@ st.title("NoteBerry :grapes:")
 contentformat = st.selectbox('Select an option',['Generate Notes', 'Generate Video Notes (Experimental)'])
 summarize = st.checkbox("Summarize (This will condense the content into short, precise information)")
 
-uploadedtext = st.file_uploader(label="Upload PDF Document (May not work well with Math/Equations)", type='pdf')
+uploadedtext = st.file_uploader(label="Upload PDF Document (May not work well with Math/Equations)", type='pdf', on_change=inject_styles)
 
 subheader = st.empty()
 
@@ -187,7 +256,7 @@ def generatecontent():
         show_pdf_file()
 
         # Render the styled box using st.markdown
-        st.html(markdown_to_custom_html(myContainer.notestext))
+        st.html(markdown_to_html(myContainer.notestext))
         myContainer.pressed = False
 
 
