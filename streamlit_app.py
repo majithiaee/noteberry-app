@@ -169,7 +169,7 @@ def generatecontent():
 
         st.write("Your AI Notes are Ready!")
 
-        show_pdf_file()
+       # show_pdf_file()
 
         # Render the styled box using st.markdown
         st.markdown(myContainer.notestext, unsafe_allow_html=True)
