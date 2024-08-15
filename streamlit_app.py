@@ -48,7 +48,7 @@ def markdown_to_html(markdown_text):
     html = re.sub(r'\$\$(.*?)\$\$', r'<span class="latex">\1</span>', html)  # Block LaTeX
     html = re.sub(r'\$(.*?)\$', r'<span class="latex">\1</span>', html)  # Inline LaTeX
 
-    return html
+    return html#
 
 def parse_lists(text):
     lines = text.split('\n')
