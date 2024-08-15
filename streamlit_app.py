@@ -50,8 +50,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Use st.markdown with the custom class
-st.markdown('<p class="custom-font">This is your body text with a custom font!</p>', unsafe_allow_html=True)
 
 def read_pdf(file):
     pdf_document = fitz.open(stream=file.read(), filetype="pdf")
@@ -114,7 +112,7 @@ def show_pdf_file():
     html = create_download_link(pdf_file)
 
     # Display the download link in Streamlit
-    st.markdown(html, unsafe_allow_html=True)
+    st.markdown(f'<p class="custom-font">{html}</p>', unsafe_allow_html=True)
 
 
 import pathlib
@@ -199,7 +197,7 @@ def generatecontent():
         show_pdf_file()
 
         # Render the styled box using st.markdown
-        st.markdown(myContainer.notestext, unsafe_allow_html=True)
+        st.markdown(f'<p class="custom-font">{myContainer.notestext}</p>', unsafe_allow_html=True)
         myContainer.pressed = False
 
 
