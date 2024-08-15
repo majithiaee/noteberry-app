@@ -63,6 +63,7 @@ model = Model(model_dir)
 
 
 hide_streamlit_style = """
+            <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             </style>
@@ -230,8 +231,8 @@ def inject_styles():
             color: white; /* Toast text color */
             font-family: 'Poppins', sans-serif; /* Font for toast text */
         }}
-        """
-         + hide_streamlit_style,
+        </style>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -506,6 +507,9 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 contentformat = st.selectbox('Select an option',['Generate Notes', 'Generate Video Notes (Experimental)'])
 summarize = st.checkbox("Summarize (This will condense the content into short, precise information)")
 
