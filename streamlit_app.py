@@ -32,7 +32,7 @@ def markdown_to_html(markdown_text):
     html = re.sub(r'\*(.*?)\*', r'<i>\1</i>', html)  # Italic
 
     # Inline Code
-    html = re.sub(r'`(.*?)`', r'<code>\1</code>', html)  # Inline code
+    html = re.sub(r'```(.*?)```', r'<code>\1</code>', html)  # Inline code
 
     # Lists
     html = re.sub(r'^\s*\*\s*(.*)', r'<li>\1</li>', html, flags=re.MULTILINE)
