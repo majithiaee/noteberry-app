@@ -21,54 +21,6 @@ from vosk import KaldiRecognizer, Model
 import zipfile
 import requests
 
-model_url = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
-model_zip = "vosk-model-small-en-us-0.15.zip"
-model_dir = "model"
-
-
-# Function to download the Vosk model
-def download_model(url, save_path):
-    response = requests.get(url, stream=True)
-    with open(save_path, "wb") as file:
-        for chunk in response.iter_content(chunk_size=8192):
-            file.write(chunk)
-
-
-# Download the Vosk model if it doesn't exist
-if not os.path.exists(model_dir):
-    with st.spinner("Retrieving Transcription Model..."):
-        download_model(model_url, model_zip)
-
-        with zipfile.ZipFile(model_zip, 'r') as zip_ref:
-            zip_ref.extractall(".")
-
-        # Verify the extracted directory name
-        extracted_dir = None
-        for item in os.listdir('.'):
-            if item.startswith("vosk-model") and os.path.isdir(item):
-                extracted_dir = item
-                break
-
-        if extracted_dir:
-            os.rename(extracted_dir, model_dir)
-            os.remove(model_zip)
-            st.write("Model downloaded and extracted.")
-        else:
-            st.write("Error: Model extraction failed.")
-            st.stop()
-
-# Load the Vosk model
-model = Model(model_dir)
-
-
-
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # Define your colors
 background_color = "#ffffff"  # Main background color
