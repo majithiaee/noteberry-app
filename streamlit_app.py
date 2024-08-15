@@ -39,9 +39,9 @@ st.markdown(
 
 def markdown_to_custom_html(markdown_text):
     # Convert Markdown to HTML
-    html = markdown.markdown(markdown_text)
+    returnthis = markdown.markdown(markdown_text)
     # Wrap HTML in a div with the custom style
-    return f'<div class="custom-font">{html}</div>'
+    return f'<div class="custom-font">{returnthis}</div>'
 
 
 def read_pdf(file):
