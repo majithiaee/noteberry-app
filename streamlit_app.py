@@ -1,106 +1,15 @@
 import streamlit as st
 import time as t
+import pickle
 
 import base64
 
+from pydub import AudioSegment
 
 
 import fitz  # PyMuPDF
 
-import re
-
-def markdown_to_html(markdown_text):
-    html = markdown_text
-
-    # Headers
-    html = re.sub(r'###### (.*)', r'<h6>\1</h6>', html)
-    html = re.sub(r'##### (.*)', r'<h5>\1</h5>', html)
-    html = re.sub(r'#### (.*)', r'<h4>\1</h4>', html)
-    html = re.sub(r'### (.*)', r'<h3>\1</h3>', html)
-    html = re.sub(r'## (.*)', r'<h2>\1</h2>', html)
-    html = re.sub(r'# (.*)', r'<h1>\1</h1>', html)
-
-    # Bold and Italic
-    html = re.sub(r'\*\*\*(.*?)\*\*\*', r'<b><i>\1</i></b>', html)  # Bold + Italic
-    html = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', html)  # Bold
-    html = re.sub(r'\*(.*?)\*', r'<i>\1</i>', html)  # Italic
-
-    # Inline Code
-    html = re.sub(r'`(.*?)`', r'<code>\1</code>', html)  # Inline code
-
-    # Nested and square bullet lists
-    html = parse_lists(html)
-
-    # Links
-    html = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2">\1</a>', html)
-
-    # Line breaks
-    html = re.sub(r'\n', r'<br>', html)
-
-    # Tables
-    html = re.sub(
-        r'\|(.+)\|\n\|([-\s:|]+)\|\n((?:\|.+\|\n)+)',
-        lambda match: parse_table(match.group(1), match.group(2), match.group(3)),
-        html
-    )
-
-    # LaTeX notation
-    html = re.sub(r'\$\$(.*?)\$\$', r'<span class="latex">\1</span>', html)  # Block LaTeX
-    html = re.sub(r'\$(.*?)\$', r'<span class="latex">\1</span>', html)  # Inline LaTeX
-
-    return html#
-
-def parse_lists(text):
-    lines = text.split('\n')
-    html = ''
-    list_stack = []
-
-    for line in lines:
-        # Check for list items with different indentations
-        indent_match = re.match(r'^( *)([*\-\+])\s+(.*)', line)
-        if indent_match:
-            indent, bullet, item = indent_match.groups()
-            level = len(indent) // 2
-
-            while len(list_stack) > level:
-                html += f'</ul>'
-                list_stack.pop()
-
-            if len(list_stack) < level:
-                html += f'<ul style="list-style-type:square;">'
-                list_stack.append('square')
-
-            html += f'<li>{item}</li>'
-        else:
-            while list_stack:
-                html += f'</ul>'
-                list_stack.pop()
-            html += line + '<br>'
-
-    while list_stack:
-        html += f'</ul>'
-        list_stack.pop()
-
-    return html
-
-def parse_table(headers, alignments, rows):
-    header_cells = headers.split('|')
-    row_lines = rows.strip().split('\n')
-    body_cells = [row.split('|') for row in row_lines]
-
-    table_html = '<table><thead><tr>'
-    for cell in header_cells:
-        table_html += f'<th>{cell.strip()}</th>'
-    table_html += '</tr></thead><tbody>'
-
-    for row in body_cells:
-        table_html += '<tr>'
-        for cell in row:
-            table_html += f'<td>{cell.strip()}</td>'
-        table_html += '</tr>'
-
-    table_html += '</tbody></table>'
-    return table_html
+import speech_recognition
 
 
 
@@ -111,36 +20,6 @@ primary_color = "#1f77b4"     # Primary color
 secondary_color = "#f0f0f0"   # Secondary color for backgrounds and components
 hover_color = "#5a8e99"       # Darker shade for hover effects
 active_color = "#155a8a"      # Even darker shade for active states
-
-def inject_styles():
-    # Inject custom CSS with the button styled to be bold
-    st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-    body {
-        font-family: 'Gaegu', sans-serif;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-
-#inject_styles()
-
-
-# Use st.markdown to include custom CSS for the font
-#st.markdown(
-#    """
- #   <style>
-  #  @import url('https://fonts.googleapis.com/css?family=Gaegu');
-#
- #   .custom-font {
-  #      font-family: 'Gaegu', sans-serif;
-   # }
-    #</style>
-    #""",
-    #unsafe_allow_html=True
-#)
-
 
 def read_pdf(file):
     pdf_document = fitz.open(stream=file.read(), filetype="pdf")
@@ -166,7 +45,8 @@ def show_pdf_file():
     pdf.add_section(
         Section(
             '''<style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');            
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+            
             body {
             font-family: 'Roboto', sans-serif;
             font-size: 12pt;
@@ -257,7 +137,7 @@ def generatecontent():
 
         # The 'with' statement is used here to manage the spinner context
         with st.spinner("Initializing AI Model..."):
-            genai.configure(api_key=st.secrets['api_key'])
+            genai.configure(api_key="AIzaSyCZObffhLbps5I-NhjgDF5seb-eeZQ8bP8")
 
             model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -272,12 +152,12 @@ def generatecontent():
         with st.spinner("Processing your content with AI..."):
             response = model.generate_content(str(r'''Put every single thing from this input into notes. Don't leave out any content at all. 
             All content MUST be in the notes. Use markdown notation for headers, subheaders, and bullet points. Give good spacing and organization. Use markdown-style tables and numbered
-             lists often (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable. If you have math equations, DO NOT use Latex notation. 
-              I repeat, DO NOT use latex notation. Also, DO NOT use any tables in Markdown. Here's the content:''') + str(
+             lists often (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable. If you have math equations, use Latex notation. For example, "f&#x27;(x) = lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}" would be
+             converted to LaTeX notation. Here's the content:''') + str(
                 input_text)) if not summarize else model.generate_content(str(r'''Summarize and condense this content into notes with just the most important
-                information. Only get the important info and overview, no need to include all of the content. Use markdown notation for headers, subheaders, and bullet points. Used numbered
-             lists often (but don't put numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable.  If you have math equations, DO NOT use 
-              LaTeX notation. I Repeat, DO NOT use latex notation. Also, DO NOT use any tables in Markdown. Give good spacing and organization.  Here's the content''') + str(
+                information. Only get the important info and overview, no need to include all of the content. Use markdown notation for headers, subheaders, and bullet points. Used markdown-style tables and numbered
+             lists often (but don't put numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable.  If you have math equations, use Latex notation. For example, "f&#x27;(x) = lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}" would be
+             converted to LaTeX notation. Give good spacing and organization.  Here's the content''') + str(
                 input_text))
             myContainer.notestext = response.text
 
@@ -297,7 +177,7 @@ def generatecontent():
 
         # The 'with' statement is used here to manage the spinner context
         with st.spinner("Initializing AI Video Model..."):
-            genai.configure(api_key=st.secrets['api_key'])
+            genai.configure(api_key="AIzaSyCZObffhLbps5I-NhjgDF5seb-eeZQ8bP8")
 
             model = genai.GenerativeModel('gemini-1.5-flash')
 
