@@ -42,64 +42,53 @@ import io
 
 
 def show_pdf_file():
-    # Convert Markdown to HTML
-    md_content = myContainer.notestext  # Replace with your actual Markdown content
-    html_content = markdown.markdown(md_content)
+    from markdown_pdf import MarkdownPdf
+    from markdown_pdf import Section
+    import html as h
 
-    # Define additional HTML/CSS styling
-    full_html_content = f'''
-    <html>
-    <head>
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    # Initialize MarkdownPdf and add sections
+    pdf = MarkdownPdf(toc_level=1)
+    pdf.add_section(
+        Section(
+            '''<style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-        body {{
+            body {
             font-family: 'Roboto', sans-serif;
             font-size: 12pt;
             color: #333333;
-        }}
-        h1 {{
+            }
+            h1 {
             font-size: 36pt;
             color: #0066cc;
             font-weight: bold;
-        }}
-        h2 {{
+            }
+            h2 {
             font-size: 20pt;
             color: #333333;
-        }}
-        h3 {{
+            }
+            h3 {
             font-size: 16pt;
             color: #333333;
-        }}
-        p {{
+            }
+            p {
             margin-bottom: 10pt;
-        }}
-        </style>
-    </head>
-    <body>
-        {html_content}
-    </body>
-    </html>
-    '''
+            }
+            </style>'''
 
-    # Generate PDF filename dynamically
-    title = myContainer.notestext.split(' ', 1)[1].split('\n', 1)[
-        0]  # Extract the first word/phrase after the first space
-    pdf_file = f"AI-Generator-{title}_notes.pdf"
+            +
+            "\n" + myContainer.notestext))  # Replace with your actual content
 
-    # Convert HTML to PDF using pdfkit
-    pdf_buffer = io.BytesIO()
-    pdfkit.from_string(full_html_content, pdf_buffer)
-    pdf_buffer.seek(0)
+    # Save the PDF to a file
+    pdf_file = "AI-Generator-" + str(
+        myContainer.notestext[myContainer.notestext.find(' ') + 1:myContainer.notestext.find('\n')]) + "_notes.pdf"
+    pdf.save(pdf_file)
 
-    # Create a download button for the PDF
-    st.download_button(
-        label="Download PDF",
-        data=pdf_buffer,
-        file_name=pdf_file,
-        mime="application/pdf"
-    )
+    # Create a download link for the PDF
+    html = create_download_link(pdf_file)
 
+    # Display the download link in Streamlit
+    st.markdown(html, unsafe_allow_html=True)
 
 import pathlib
 import textwrap
