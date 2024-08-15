@@ -246,11 +246,13 @@ def generatecontent():
 
         with st.spinner("Processing your content with AI..."):
             response = model.generate_content(str(r'''Put every single thing from this input into notes. Don't leave out any content at all. 
-            All content MUST be in the notes. Use html code for headers, subheaders, and bullet points. Give good spacing and organization. Use markdown-style tables and numbered
-             lists often (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable. Here's the content:''') + str(
+            All content MUST be in the notes. Use markdown notation for headers, subheaders, and bullet points. Give good spacing and organization. Use markdown-style tables and numbered
+             lists often (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable. If you have math equations, DO NOT use Latex notation. 
+              I repeat, DO NOT use latex notation. Also, DO NOT use any tables in Markdown. Here's the content:''') + str(
                 input_text)) if not summarize else model.generate_content(str(r'''Summarize and condense this content into notes with just the most important
-                information. Only get the important info and overview, no need to include all of the content. Use html code for headers, subheaders, and bullet points. Use numbered lists often (but don't put numbered lists in subheaders, e.g., numbered lists that have more content under them), 
-                bullet points, etc. when applicable.  Give good spacing and organization.  Here's the content''') + str(
+                information. Only get the important info and overview, no need to include all of the content. Use markdown notation for headers, subheaders, and bullet points. Used numbered
+             lists often (but don't put numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable.  If you have math equations, DO NOT use 
+              LaTeX notation. I Repeat, DO NOT use latex notation. Also, DO NOT use any tables in Markdown. Give good spacing and organization.  Here's the content''') + str(
                 input_text))
             myContainer.notestext = response.text
 
@@ -259,7 +261,7 @@ def generatecontent():
         #show_pdf_file()
 
         # Render the styled box using st.markdown
-        st.html(myContainer.notestext)
+        st.html(markdown_to_html(myContainer.notestext))
         myContainer.pressed = False
 
 
