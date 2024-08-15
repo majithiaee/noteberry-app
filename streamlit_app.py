@@ -76,32 +76,6 @@ def parse_table(headers, alignments, rows):
     table_html += '</tbody></table>'
     return table_html
 
-markdown_text = """
-# Header 1
-## Header 2
-
-This is **bold text**, this is *italic text*, and this is `inline code`.
-
-Here is a [link](http://example.com).
-
-* List item 1
-* List item 2
-
-| Header 1 | Header 2 |
-|----------|----------|
-| Row 1 Col 1 | Row 1 Col 2 |
-| Row 2 Col 1 | Row 2 Col 2 |
-
-Inline LaTeX: $E = mc^2$
-
-Block LaTeX:
-$$
-\\frac{a}{b} = c
-$$
-"""
-
-html_output = markdown_to_html(markdown_text)
-st.html(html_output)
 
 # Define your colors
 background_color = "#ffffff"  # Main background color
@@ -272,13 +246,11 @@ def generatecontent():
 
         with st.spinner("Processing your content with AI..."):
             response = model.generate_content(str(r'''Put every single thing from this input into notes. Don't leave out any content at all. 
-            All content MUST be in the notes. Use markdown notation for headers, subheaders, and bullet points. Give good spacing and organization. Use markdown-style tables and numbered
-             lists often (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable. If you have math equations, use Latex notation. For example, "f&#x27;(x) = lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}" would be
-             converted to LaTeX notation. Here's the content:''') + str(
+            All content MUST be in the notes. Use html code for headers, subheaders, and bullet points. Give good spacing and organization. Use markdown-style tables and numbered
+             lists often (but dont use numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable. Here's the content:''') + str(
                 input_text)) if not summarize else model.generate_content(str(r'''Summarize and condense this content into notes with just the most important
-                information. Only get the important info and overview, no need to include all of the content. Use markdown notation for headers, subheaders, and bullet points. Used markdown-style tables and numbered
-             lists often (but don't put numbered lists in subheaders, e.g., numbered lists that have more content under them), bullet points, etc. when applicable.  If you have math equations, use Latex notation. For example, "f&#x27;(x) = lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}" would be
-             converted to LaTeX notation. Give good spacing and organization.  Here's the content''') + str(
+                information. Only get the important info and overview, no need to include all of the content. Use html code for headers, subheaders, and bullet points. Use numbered lists often (but don't put numbered lists in subheaders, e.g., numbered lists that have more content under them), 
+                bullet points, etc. when applicable.  Give good spacing and organization.  Here's the content''') + str(
                 input_text))
             myContainer.notestext = response.text
 
