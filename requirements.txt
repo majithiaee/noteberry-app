@@ -5,3 +5,4 @@ requests
 markdown-pdf
 google-generativeai
 ipython
+markdown

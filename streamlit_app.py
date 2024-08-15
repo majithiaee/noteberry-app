@@ -1,15 +1,13 @@
 import streamlit as st
 import time as t
-import pickle
+import markdown
 
 import base64
 
-from pydub import AudioSegment
 
 
 import fitz  # PyMuPDF
 
-import speech_recognition
 
 
 
@@ -21,19 +19,8 @@ secondary_color = "#f0f0f0"   # Secondary color for backgrounds and components
 hover_color = "#5a8e99"       # Darker shade for hover effects
 active_color = "#155a8a"      # Even darker shade for active states
 
-def inject_styles():
-    # Inject custom CSS with the button styled to be bold
-    st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-    body {
-        font-family: 'Gaegu', sans-serif;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
 
-inject_styles()
 
 
 # Use st.markdown to include custom CSS for the font
@@ -49,6 +36,12 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+def markdown_to_custom_html(markdown_text):
+    # Convert Markdown to HTML
+    html = markdown.markdown(markdown_text)
+    # Wrap HTML in a div with the custom style
+    return f'<div class="custom-font">{html}</div>'
 
 
 def read_pdf(file):
@@ -194,7 +187,7 @@ def generatecontent():
         show_pdf_file()
 
         # Render the styled box using st.markdown
-        st.markdown(f'<div class="custom-font">{myContainer.notestext}</div>', unsafe_allow_html=False)
+        st.markdown(markdown_to_custom_html(myContainer.notestext), unsafe_allow_html=False)
         myContainer.pressed = False
 
 
