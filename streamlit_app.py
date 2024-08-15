@@ -40,7 +40,7 @@ inject_styles()
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+    @import url('https://fonts.googleapis.com/css?family=Gaegu');
 
     .custom-font {
         font-family: 'Roboto', sans-serif;
