@@ -6,4 +6,5 @@ markdown
 google-generativeai
 ipython
 weasyprint
+pdfkit
 

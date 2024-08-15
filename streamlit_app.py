@@ -36,10 +36,6 @@ def create_download_link(filename):
         return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download file</a>'
 
 
-import streamlit as st
-import markdown
-from weasyprint import HTML
-import io
 
 
 def show_pdf_file():
