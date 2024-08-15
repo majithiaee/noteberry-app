@@ -1,3 +1,4 @@
+import markdown
 import streamlit as st
 import time as t
 import pickle
@@ -15,76 +16,8 @@ import re
 
 import re
 
-def markdown_to_html(markdown_text):
-    html = markdown_text
-
-    # Headers
-    html = re.sub(r'###### (.*)', r'<h6>\1</h6>', html)
-    html = re.sub(r'##### (.*)', r'<h5>\1</h5>', html)
-    html = re.sub(r'#### (.*)', r'<h4>\1</h4>', html)
-    html = re.sub(r'### (.*)', r'<h3>\1</h3>', html)
-    html = re.sub(r'## (.*)', r'<h2>\1</h2>', html)
-    html = re.sub(r'# (.*)', r'<h1>\1</h1>', html)
-
-    # Bold and Italic
-    html = re.sub(r'\*\*\*(.*?)\*\*\*', r'<b><i>\1</i></b>', html)  # Bold + Italic
-    html = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', html)  # Bold
-    html = re.sub(r'\*(.*?)\*', r'<i>\1</i>', html)  # Italic
-
-    # Inline Code
-    html = re.sub(r'```(.*?)```', r'<code>\1</code>', html)  # Inline code
-    html = re.sub(r'`(.*?)`', r'<code>\1</code>', html)  # Inline code
-
-    # Lists
-    html = re.sub(r'^\s*\*\s*(.*)', r'<li>\1</li>', html, flags=re.MULTILINE)
-    html = re.sub(r'(<li>.*</li>)', r'<ul>\1</ul>', html, flags=re.DOTALL)
-
-    # Links
-    html = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2">\1</a>', html)
-
-    # Line breaks
-    html = re.sub(r'\n', r'<br>', html)
-
-    # Tables
-    html = re.sub(
-        r'\|(.+)\|\n\|([-\s:|]+)\|\n((?:\|.+\|\n)+)',
-        lambda match: parse_table(match.group(1), match.group(2), match.group(3)),
-        html
-    )
-
-    # LaTeX notation
-    html = re.sub(r'\$\$(.*?)\$\$', r'<span class="latex">\1</span>', html)  # Block LaTeX
-    html = re.sub(r'\$(.*?)\$', r'<span class="latex">\1</span>', html)  # Inline LaTeX
-
-    return html
-
-def parse_table(headers, alignments, rows):
-    header_cells = headers.split('|')
-    row_lines = rows.strip().split('\n')
-    body_cells = [row.split('|') for row in row_lines]
-
-    table_html = '<table><thead><tr>'
-    for cell in header_cells:
-        table_html += f'<th>{cell.strip()}</th>'
-    table_html += '</tr></thead><tbody>'
-
-    for row in body_cells:
-        table_html += '<tr>'
-        for cell in row:
-            table_html += f'<td>{cell.strip()}</td>'
-        table_html += '</tr>'
-
-    table_html += '</tbody></table>'
-    return table_html
-
-
-# Define your colors
-background_color = "#ffffff"  # Main background color
-text_color = "#333333"        # Text color
-primary_color = "#1f77b4"     # Primary color
-secondary_color = "#f0f0f0"   # Secondary color for backgrounds and components
-hover_color = "#5a8e99"       # Darker shade for hover effects
-active_color = "#155a8a"      # Even darker shade for active states
+def markdown_to_html(inputStr):
+    return markdown.markdown(inputStr)
 
 def inject_styles():
     # Inject custom CSS with the button styled to be bold
