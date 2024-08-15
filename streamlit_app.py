@@ -36,6 +36,9 @@ def create_download_link(filename):
         return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download file</a>'
 
 
+import markdown
+import pdfkit
+import io
 
 
 def show_pdf_file():
@@ -84,9 +87,9 @@ def show_pdf_file():
         0]  # Extract the first word/phrase after the first space
     pdf_file = f"AI-Generator-{title}_notes.pdf"
 
-    # Convert HTML to PDF
+    # Convert HTML to PDF using pdfkit
     pdf_buffer = io.BytesIO()
-    HTML(string=full_html_content).write_pdf(pdf_buffer)
+    pdfkit.from_string(full_html_content, pdf_buffer)
     pdf_buffer.seek(0)
 
     # Create a download button for the PDF
