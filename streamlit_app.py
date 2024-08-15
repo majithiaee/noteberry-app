@@ -35,62 +35,72 @@ def create_download_link(filename):
         b64 = base64.b64encode(pdf_bytes).decode()  # encode in base64 (binary-to-text)
         return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download file</a>'
 
+
+import streamlit as st
+import markdown
+from weasyprint import HTML
+import io
+
+
 def show_pdf_file():
-    from markdown_pdf import MarkdownPdf, Section
-    import streamlit as st
+    # Convert Markdown to HTML
+    md_content = myContainer.notestext  # Replace with your actual Markdown content
+    html_content = markdown.markdown(md_content)
 
-    # Initialize MarkdownPdf and add sections
-    pdf = MarkdownPdf(toc_level=1)
-    pdf.add_section(
-        Section(
-            '''
-            <style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    # Define additional HTML/CSS styling
+    full_html_content = f'''
+    <html>
+    <head>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-            body {
-                font-family: 'Roboto', sans-serif;
-                font-size: 12pt;
-                color: #333333;
-            }
-            h1 {
-                font-size: 36pt;
-                color: #0066cc;
-                font-weight: bold;
-            }
-            h2 {
-                font-size: 20pt;
-                color: #333333;
-            }
-            h3 {
-                font-size: 16pt;
-                color: #333333;
-            }
-            p {
-                margin-bottom: 10pt;
-            }
-            </style>
-            '''
-            + "\n" + myContainer.notestext  # Replace with your actual content
-        )
-    )
+        body {{
+            font-family: 'Roboto', sans-serif;
+            font-size: 12pt;
+            color: #333333;
+        }}
+        h1 {{
+            font-size: 36pt;
+            color: #0066cc;
+            font-weight: bold;
+        }}
+        h2 {{
+            font-size: 20pt;
+            color: #333333;
+        }}
+        h3 {{
+            font-size: 16pt;
+            color: #333333;
+        }}
+        p {{
+            margin-bottom: 10pt;
+        }}
+        </style>
+    </head>
+    <body>
+        {html_content}
+    </body>
+    </html>
+    '''
 
     # Generate PDF filename dynamically
-    title = myContainer.notestext.split(' ', 1)[1].split('\n', 1)[0]  # Extract the first word/phrase after the first space
+    title = myContainer.notestext.split(' ', 1)[1].split('\n', 1)[
+        0]  # Extract the first word/phrase after the first space
     pdf_file = f"AI-Generator-{title}_notes.pdf"
 
-    # Save the PDF to a file
-    pdf.save(pdf_file)
+    # Convert HTML to PDF
+    pdf_buffer = io.BytesIO()
+    HTML(string=full_html_content).write_pdf(pdf_buffer)
+    pdf_buffer.seek(0)
 
-    # Create a download link for the PDF
-    with open(pdf_file, "rb") as file:
-        btn = st.download_button(
-            label="Download PDF",
-            data=file,
-            file_name=pdf_file,
-            mime="application/pdf"
-        )
+    # Create a download button for the PDF
+    st.download_button(
+        label="Download PDF",
+        data=pdf_buffer,
+        file_name=pdf_file,
+        mime="application/pdf"
+    )
 
-    return btn
 
 import pathlib
 import textwrap
