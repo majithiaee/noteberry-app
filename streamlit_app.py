@@ -99,7 +99,7 @@ import google.generativeai as genai
 
 from IPython.display import Markdown
 
-st.title("NoteBerry :grapes:")
+st.title("Noteberry :grapes: :strawberry:")
 
 contentformat = st.selectbox('Select an option',['Generate Notes', 'Generate Video Notes (Experimental)'])
 summarize = st.checkbox("Summarize (This will condense the content into short, precise information)")
