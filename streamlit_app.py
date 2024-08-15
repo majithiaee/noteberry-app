@@ -119,7 +119,7 @@ st.title("NoteBerry :grapes:")
 contentformat = st.selectbox('Select an option',['Generate Notes', 'Generate Video Notes (Experimental)'])
 summarize = st.checkbox("Summarize (This will condense the content into short, precise information)")
 
-uploadedtext = st.file_uploader(label="Upload PDF Document (May not work well with Math/Equations)", type='pdf', on_change=inject_styles)
+uploadedtext = st.file_uploader(label="Upload PDF Document (May not work well with Math/Equations)", type='pdf')
 
 subheader = st.empty()
 
