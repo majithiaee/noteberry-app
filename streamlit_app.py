@@ -32,15 +32,10 @@ def create_download_link(filename):
         return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download file</a>'
 
 
-import markdown
-import pdfkit
-import io
-
 
 def show_pdf_file():
     from markdown_pdf import MarkdownPdf
     from markdown_pdf import Section
-    import html as h
 
     # Initialize MarkdownPdf and add sections
     pdf = MarkdownPdf(toc_level=1)
@@ -86,10 +81,7 @@ def show_pdf_file():
     # Display the download link in Streamlit
     st.markdown(html, unsafe_allow_html=True)
 
-import pathlib
 import textwrap
-import tempfile
-from datetime import time
 
 import google.generativeai as genai
 
