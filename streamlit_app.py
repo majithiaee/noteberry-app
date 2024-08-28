@@ -24,7 +24,7 @@ def read_pdf(file):
         page = pdf_document.load_page(page_num)
         text += page.get_text("text")  # Using "text" option for better text extraction
     return text
-
+ #
 def create_download_link(filename):
     with open(filename, "rb") as f:
         pdf_bytes = f.read()
