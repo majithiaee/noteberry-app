@@ -1,13 +1,11 @@
 import streamlit as st
 import time as t
-import pickle
 
 import base64
 
 
 import fitz  # PyMuPDF
 
-import speech_recognition
 
 
 
