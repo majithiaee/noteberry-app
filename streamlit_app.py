@@ -4,8 +4,6 @@ import pickle
 
 import base64
 
-from pydub import AudioSegment
-
 
 import fitz  # PyMuPDF
 
