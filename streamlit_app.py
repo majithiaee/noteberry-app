@@ -17,6 +17,7 @@ secondary_color = "#f0f0f0"   # Secondary color for backgrounds and components
 hover_color = "#5a8e99"       # Darker shade for hover effects
 active_color = "#155a8a"      # Even darker shade for active states
 
+st.set_page_config(page_title="Noteberry - AI Note Taker")
 def read_pdf(file):
     pdf_document = fitz.open(stream=file.read(), filetype="pdf")
     text = ""
